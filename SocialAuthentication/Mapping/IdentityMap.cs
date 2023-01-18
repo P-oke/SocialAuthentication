@@ -34,9 +34,9 @@ namespace SocialAuthentication.Mapping
 
         /// <summary>
         /// Class RoleMap.
-        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.UserClaim}" />
+        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.UserClaim}" />
         /// </summary>
-        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.UserClaim}" />
+        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.UserClaim}" />
         public class UserClaimMap : IEntityTypeConfiguration<UserClaim>
         {
             /// <summary>
@@ -51,9 +51,9 @@ namespace SocialAuthentication.Mapping
 
         /// <summary>
         /// Class RoleMap.
-        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.RoleClaim}" />
+        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.RoleClaim}" />
         /// </summary>
-        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.RoleClaim}" />
+        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.RoleClaim}" />
         public class RoleClaimMap : IEntityTypeConfiguration<RoleClaim>
         {
             /// <summary>
@@ -70,9 +70,9 @@ namespace SocialAuthentication.Mapping
 
         /// <summary>
         /// Class RoleMap.
-        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.UserLogin}" />
+        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.UserLogin}" />
         /// </summary>
-        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.UserLogin}" />
+        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.UserLogin}" />
         public class UserLoginMap : IEntityTypeConfiguration<UserLogin>
         {
             /// <summary>
@@ -87,9 +87,9 @@ namespace SocialAuthentication.Mapping
 
         /// <summary>
         /// Class UserRoleMap.
-        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.UserRole}" />
+        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.UserRole}" />
         /// </summary>
-        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.UserRole}" />
+        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.UserRole}" />
         public class UserRoleMap : IEntityTypeConfiguration<UserRole>
         {
             /// <summary>
@@ -101,15 +101,13 @@ namespace SocialAuthentication.Mapping
                 builder.ToTable(nameof(UserRole));
 
             }
-
-
         }
 
         /// <summary>
         /// Class UserTokenMap.
-        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.UserToken}" />
+        /// Implements the <see cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.UserToken}" />
         /// </summary>
-        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{RapX.Entities.UserToken}" />
+        /// <seealso cref="Microsoft.EntityFrameworkCore.IEntityTypeConfiguration{SocialAuthentication.Entities.UserToken}" />
         public class UserTokenMap : IEntityTypeConfiguration<UserToken>
         {
             /// <summary>

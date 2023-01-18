@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SocialAuthentication.Configuration;
 using SocialAuthentication.Context;
 using SocialAuthentication.Entities;
 using SocialAuthentication.FacebookAuthentication;
@@ -7,6 +8,8 @@ using SocialAuthentication.GoogleAuthentication;
 using SocialAuthentication.Interfaces;
 using SocialAuthentication.Services;
 using System;
+using System.Configuration;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,10 +46,36 @@ builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IFacebookAuthService, FacebookAuthService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+var jwtSection = builder.Configuration.GetSection("JWT");
+builder.Services.Configure<Jwt>(jwtSection);
+
+var appSettings = jwtSection.Get<Jwt>();
+var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+}).AddJwtBearer(o =>
+            {
+            o.RequireHttpsMetadata = true;
+            o.SaveToken = true;
+            o.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = appSettings.ValidIssuer,
+                ValidAudience = appSettings.ValidAudience,
+                ValidateIssuerSigningKey = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+                RequireExpirationTime = true,
+                IssuerSigningKey = new SymmetricSecurityKey(secret)
+            };
 
 
-
-var app = builder.Build();
+            var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -62,3 +91,33 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public class e
+{
+    var appSettingsSection = Configuration.GetSection("JWT");
+    services.Configure<Jwt>(appSettingsSection);
+
+            var appSettings = appSettingsSection.Get<Jwt>();
+    var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+    services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+{
+    o.RequireHttpsMetadata = true;
+    o.SaveToken = true;
+    o.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = appSettings.ValidIssuer,
+        ValidAudience = appSettings.ValidAudience,
+        ValidateIssuerSigningKey = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.Zero,
+        RequireExpirationTime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(secret)
+    };
+}
