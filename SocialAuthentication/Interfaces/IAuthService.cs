@@ -5,6 +5,6 @@ namespace SocialAuthentication.Interfaces
 {
     public interface IAuthService 
     {
-        Task<BaseResponse<string>> SignInWithGoogle(GoogleSignInVM model);
+        Task<BaseResponse<JwtResponseVM>> SignInWithGoogle(GoogleSignInVM model);
     }
 }

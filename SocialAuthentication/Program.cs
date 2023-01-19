@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SocialAuthentication.Configuration;
 using SocialAuthentication.Context;
 using SocialAuthentication.Entities;
@@ -46,6 +48,7 @@ builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IFacebookAuthService, FacebookAuthService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Google"));
 var jwtSection = builder.Configuration.GetSection("JWT");
 builder.Services.Configure<Jwt>(jwtSection);
 
@@ -58,53 +61,6 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
 }).AddJwtBearer(o =>
-            {
-            o.RequireHttpsMetadata = true;
-            o.SaveToken = true;
-            o.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidIssuer = appSettings.ValidIssuer,
-                ValidAudience = appSettings.ValidAudience,
-                ValidateIssuerSigningKey = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
-                RequireExpirationTime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(secret)
-            };
-
-
-            var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
-
-public class e
-{
-    var appSettingsSection = Configuration.GetSection("JWT");
-    services.Configure<Jwt>(appSettingsSection);
-
-            var appSettings = appSettingsSection.Get<Jwt>();
-    var secret = Encoding.ASCII.GetBytes(appSettings.Secret);
-
-    services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(o =>
 {
     o.RequireHttpsMetadata = true;
     o.SaveToken = true;
@@ -120,4 +76,23 @@ public class e
         RequireExpirationTime = true,
         IssuerSigningKey = new SymmetricSecurityKey(secret)
     };
+
+});
+           
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
