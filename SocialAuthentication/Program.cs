@@ -11,6 +11,7 @@ using SocialAuthentication.Interfaces;
 using SocialAuthentication.Services;
 using System;
 using System.Configuration;
+using System.Net.Http.Headers;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,13 @@ builder.Services.AddScoped<IFacebookAuthService, FacebookAuthService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Google"));
+builder.Services.Configure<FacebookAuthConfig>(builder.Configuration.GetSection("Facebook"));
+
+builder.Services.AddHttpClient("Facebook", c =>
+{
+    c.BaseAddress = new Uri(builder.Configuration.GetValue<string>("Facebook:BaseUrl"));
+});
+
 var jwtSection = builder.Configuration.GetSection("JWT");
 builder.Services.Configure<Jwt>(jwtSection);
 
