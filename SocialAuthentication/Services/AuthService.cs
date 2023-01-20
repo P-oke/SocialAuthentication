@@ -3,10 +3,13 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Extensions;
 using SocialAuthentication.Configuration;
 using SocialAuthentication.Context;
 using SocialAuthentication.DTOs;
 using SocialAuthentication.Entities;
+using SocialAuthentication.Enum;
+using SocialAuthentication.FacebookAuthentication;
 using SocialAuthentication.GoogleAuthentication;
 using SocialAuthentication.Interfaces;
 using SocialAuthentication.Util;
@@ -14,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace SocialAuthentication.Services
 {
@@ -21,12 +25,21 @@ namespace SocialAuthentication.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IGoogleAuthService _googleAuthService;
+        private readonly IFacebookAuthService _facebookAuthService;
+        private readonly UserManager<User> _userManager;
         private readonly Jwt _jwt; 
 
-        public AuthService(ApplicationDbContext context, IGoogleAuthService googleAuthService, IOptions<Jwt>jwt)
+        public AuthService(
+            ApplicationDbContext context, 
+            IGoogleAuthService googleAuthService, 
+            IFacebookAuthService  facebookAuthService, 
+            UserManager<User> userManager,
+            IOptions<Jwt>jwt)
         {
             _context = context; 
             _googleAuthService = googleAuthService;
+            _facebookAuthService = facebookAuthService;
+            _userManager = userManager;
             _jwt = jwt.Value;
         }
 
@@ -87,6 +100,45 @@ namespace SocialAuthentication.Services
             return userClaims;
         }
 
-        
+        public async Task<BaseResponse<JwtResponseVM>> SignInWithFacebook(FacebookSignInVM model)
+        {
+            var validatedFbToken = await _facebookAuthService.ValidateFacebookToken(model.AccessToken);
+
+            if(validatedFbToken.Errors.Any())
+                return new BaseResponse<JwtResponseVM>(validatedFbToken.ResponseMessage, validatedFbToken.Errors);
+
+            var userInfo = await _facebookAuthService.GetFacebookUserInformation(model.AccessToken);
+
+            if (userInfo.Errors.Any())
+                return new BaseResponse<JwtResponseVM>(null, userInfo.Errors);
+
+            var userToBeCreated = new CreateUserFromSocialLogin
+            {
+                FirstName = userInfo.Data.FirstName,
+                LastName = userInfo.Data.LastName,
+                Email = userInfo.Data.Email,
+                ProfilePicture = userInfo.Data.Picture.Data.Url.AbsoluteUri,
+                LoginProviderSubject = userInfo.Data.Id,
+            };
+
+            var user = await _userManager.CreateUserFromSocialLogin(_context, userToBeCreated, LoginProvider.Facebook);
+
+            if (user is not null)
+            {
+                var jwtResponse = CreateJwtToken(user);
+
+                var data = new JwtResponseVM
+                {
+                    Token = jwtResponse,
+                };
+
+                return new BaseResponse<JwtResponseVM>(data);
+            }
+
+            return new BaseResponse<JwtResponseVM>(null, userInfo.Errors);
+
+        }
+
+      
     }
 }

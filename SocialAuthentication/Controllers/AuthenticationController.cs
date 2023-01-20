@@ -32,7 +32,25 @@ namespace SocialAuthentication.Controllers
             }
             catch (Exception ex)
             {
+                return HandleError(ex);
+            }
+        }
 
+        /// <summary>
+        /// SIGN IN WITH FACEBOOK
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ProducesResponseType(typeof(BaseResponse<bool>), 200)]
+        public async Task<IActionResult> FacebookSignIn(FacebookSignInVM model) 
+        {
+            try
+            {
+                return ReturnResponse(await _authService.SignInWithFacebook(model));
+            }
+            catch (Exception ex)
+            {
                 return HandleError(ex);
             }
         }
