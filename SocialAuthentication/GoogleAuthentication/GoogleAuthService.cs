@@ -13,6 +13,11 @@ using static Google.Apis.Auth.GoogleJsonWebSignature;
 
 namespace SocialAuthentication.GoogleAuthentication
 {
+    /// <summary>
+    /// Class Facebook Auth Service.
+    /// Implements the <see cref="SocialAuthentication.GoogleAuthentication.IGoogleAuthService" />
+    /// </summary>
+    /// <seealso cref="SocialAuthentication.GoogleAuthentication.IGoogleAuthService" />
     public class GoogleAuthService : IGoogleAuthService
     {
         private readonly UserManager<User> _userManager;
@@ -32,6 +37,11 @@ namespace SocialAuthentication.GoogleAuthentication
             _logger = LogManager.GetLogger(typeof(GoogleAuthService));
         }
 
+        /// <summary>
+        /// Google SignIn
+        /// </summary>
+        /// <param name="model">the model</param>
+        /// <returns>Task&lt;BaseResponse&lt;User&gt;&gt;</returns>
         public async Task<BaseResponse<User>> GoogleSignIn(GoogleSignInVM model)
         {
 
@@ -48,7 +58,7 @@ namespace SocialAuthentication.GoogleAuthentication
             catch (Exception ex)
             {
                 _logger.Error(ex.Message, ex);
-                return new BaseResponse<User>(ex.Message, new List<string> { ex.Message });
+                return new BaseResponse<User>(null, new List<string> { "Failed to get a response" });
             }
 
             var userToBeCreated = new CreateUserFromSocialLogin

@@ -33,10 +33,10 @@ namespace SocialAuthentication.Controllers
             rsp.Status = RequestExecution.Error;
 #if DEBUG
             rsp.Errors = new List<string>() { $"Error: {(ex?.InnerException?.Message ?? ex.Message)} --> {ex?.StackTrace}" };
-            return Ok(rsp);
+            return BadRequest(rsp);
 #else
              rsp.Errors = new List<string>() { "An error occurred while processing your request!"};
-             return Ok(rsp);
+             return BadRequest(rsp);
 #endif
         }
     }
