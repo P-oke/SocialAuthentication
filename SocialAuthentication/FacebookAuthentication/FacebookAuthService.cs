@@ -7,6 +7,11 @@ using System.Net.Http;
 
 namespace SocialAuthentication.FacebookAuthentication
 {
+    /// <summary>
+    /// Class Facebook Auth Service.
+    /// Implements the <see cref="SocialAuthentication.FacebookAuthentication.IFacebookAuthService" />
+    /// </summary>
+    /// <seealso cref="SocialAuthentication.FacebookAuthentication.IFacebookAuthService" />
     public class FacebookAuthService : IFacebookAuthService
     {
      
@@ -16,7 +21,6 @@ namespace SocialAuthentication.FacebookAuthentication
 
         public FacebookAuthService(
             IHttpClientFactory httpClientFactory, 
-            IConfiguration configuration, 
             IOptions<FacebookAuthConfig> facebookAuthConfig)
         {
             _httpClient = httpClientFactory.CreateClient("Facebook");
@@ -24,7 +28,11 @@ namespace SocialAuthentication.FacebookAuthentication
             _logger = LogManager.GetLogger(typeof(FacebookAuthService));
         }
 
-
+        /// <summary>
+        /// Validates Facebook Accesstoken
+        /// </summary>
+        /// <param name="accessToken">the accesstoken from facebook</param>
+        /// <returns>Task&lt;BaseResponse&lt;FacebookTokenValidationResponse&gt;&gt;</returns>
         public async Task<BaseResponse<FacebookTokenValidationResponse>> ValidateFacebookToken(string accessToken)
         {
             try
@@ -50,6 +58,11 @@ namespace SocialAuthentication.FacebookAuthentication
 
         }
 
+        /// <summary>
+        /// Get Facebook User Information.
+        /// </summary>
+        /// <param name="accessToken">the access token from facebook</param>
+        /// <returns>Task&lt;BaseResponse&lt;FacebookUserInfoResponse&gt;&gt;</returns>
         public async Task<BaseResponse<FacebookUserInfoResponse>> GetFacebookUserInformation(string accessToken) 
         {
             try

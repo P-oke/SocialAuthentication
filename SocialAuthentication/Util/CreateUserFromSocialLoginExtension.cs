@@ -10,9 +10,18 @@ namespace SocialAuthentication.Util
 {
     public static class CreateUserFromSocialLoginExtension
     {
+        /// <summary>
+        /// Creates user from social login
+        /// </summary>
+        /// <param name="userManager">the usermanager</param>
+        /// <param name="context">the context</param>
+        /// <param name="model">the model</param>
+        /// <param name="loginProvider">the login provider</param>
+        /// <returns>System.Threading.Tasks.Task&lt;User&gt;</returns>
         
         public static async Task<User> CreateUserFromSocialLogin(this UserManager<User> userManager, ApplicationDbContext context, CreateUserFromSocialLogin model, LoginProvider loginProvider)
         {
+            //CHECKS IF THE USER HAS NOT ALREADY BEEN LINKED TO AN IDENTITY PROVIDER
             var user = await userManager.FindByLoginAsync(loginProvider.GetDisplayName(), model.LoginProviderSubject);
 
             if (user is not null)
@@ -33,7 +42,7 @@ namespace SocialAuthentication.Util
 
                 await userManager.CreateAsync(user);
 
-                //EMAIL IS CONFIRMED BECAUSE IT IS COMING FROM A SECURED AUTHENTICATION PROVIDER
+                //EMAIL IS CONFIRMED; IT IS COMING FROM AN IDENTITY PROVIDER
                 user.EmailConfirmed = true;
 
                 await userManager.UpdateAsync(user);
@@ -57,6 +66,7 @@ namespace SocialAuthentication.Util
                     break;
             }
 
+            //ADDS THE USER TO AN IDENTITY PROVIDER
             var result = await userManager.AddLoginAsync(user, userLoginInfo);
 
             if (result.Succeeded)

@@ -21,6 +21,11 @@ using static Google.Apis.Requests.BatchRequest;
 
 namespace SocialAuthentication.Services
 {
+    /// <summary>
+    /// Class Auth Service.
+    /// Implements the <see cref="SocialAuthentication.Interfaces.IAuthService" />
+    /// </summary>
+    /// <seealso cref="SocialAuthentication.Interfaces.IAuthService" />
     public class AuthService : IAuthService 
     {
         private readonly ApplicationDbContext _context;
@@ -46,8 +51,8 @@ namespace SocialAuthentication.Services
         /// <summary>
         /// Google SignIn 
         /// </summary>
-        /// <param name="model">The model</param>
-        /// <returns>Task&lt;ResultModel&lt;JwtResponseVM&gt;&gt;</returns>
+        /// <param name="model">the view model</param>
+        /// <returns>Task&lt;BaseResponse&lt;JwtResponseVM&gt;&gt;</returns>
         public async Task<BaseResponse<JwtResponseVM>> SignInWithGoogle(GoogleSignInVM model) 
         {
 
@@ -66,40 +71,11 @@ namespace SocialAuthentication.Services
             return new BaseResponse<JwtResponseVM>(data);
         }
 
-        private string CreateJwtToken(User user)
-        { 
-
-            var key = Encoding.ASCII.GetBytes(_jwt.Secret);
-
-            var userClaims = BuildUserClaims(user);
-
-            var signKey = new SymmetricSecurityKey(key);
-
-            var jwtSecurityToken = new JwtSecurityToken(
-                issuer: _jwt.ValidIssuer,
-                notBefore: DateTime.UtcNow,
-                audience: _jwt.ValidAudience,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwt.DurationInMinutes)),
-                claims: userClaims,
-                signingCredentials: new SigningCredentials(signKey, SecurityAlgorithms.HmacSha256));
-
-            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
-        }
-
-        private List<Claim> BuildUserClaims(User user)
-        {
-            var userClaims = new List<Claim>()
-            {
-                new Claim(JwtClaimTypes.Id, user.Id.ToString()),
-                new Claim(JwtClaimTypes.Email, user.Email),
-                new Claim(JwtClaimTypes.GivenName, user.FirstName),
-                new Claim(JwtClaimTypes.FamilyName, user.LastName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
-
-            return userClaims;
-        }
-
+        /// <summary>
+        /// Facebook SignIn
+        /// </summary>
+        /// <param name="model">the view model</param>
+        /// <returns>Task&lt;BaseResponse&lt;JwtResponseVM&gt;&gt;</returns>
         public async Task<BaseResponse<JwtResponseVM>> SignInWithFacebook(FacebookSignInVM model)
         {
             var validatedFbToken = await _facebookAuthService.ValidateFacebookToken(model.AccessToken);
@@ -139,6 +115,49 @@ namespace SocialAuthentication.Services
 
         }
 
-      
+        /// <summary>
+        /// Creates JWT Token
+        /// </summary>
+        /// <param name="user">the user</param>
+        /// <returns>System.String</returns>
+        private string CreateJwtToken(User user)
+        {
+
+            var key = Encoding.ASCII.GetBytes(_jwt.Secret);
+
+            var userClaims = BuildUserClaims(user);
+
+            var signKey = new SymmetricSecurityKey(key);
+
+            var jwtSecurityToken = new JwtSecurityToken(
+                issuer: _jwt.ValidIssuer,
+                notBefore: DateTime.UtcNow,
+                audience: _jwt.ValidAudience,
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(_jwt.DurationInMinutes)),
+                claims: userClaims,
+                signingCredentials: new SigningCredentials(signKey, SecurityAlgorithms.HmacSha256));
+
+            return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+        }
+
+        /// <summary>
+        /// Builds the UserClaims
+        /// </summary>
+        /// <param name="user">the User</param>
+        /// <returns>List&lt;System.Security.Claims&gt;</returns>
+        private List<Claim> BuildUserClaims(User user)
+        {
+            var userClaims = new List<Claim>()
+            {
+                new Claim(JwtClaimTypes.Id, user.Id.ToString()),
+                new Claim(JwtClaimTypes.Email, user.Email),
+                new Claim(JwtClaimTypes.GivenName, user.FirstName),
+                new Claim(JwtClaimTypes.FamilyName, user.LastName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+
+            return userClaims;
+        }
+
     }
 }
