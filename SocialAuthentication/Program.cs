@@ -8,6 +8,7 @@ using SocialAuthentication.Entities;
 using SocialAuthentication.FacebookAuthentication;
 using SocialAuthentication.GoogleAuthentication;
 using SocialAuthentication.Interfaces;
+using SocialAuthentication.LinkedInAuthentication;
 using SocialAuthentication.Services;
 using System;
 using System.Configuration;
@@ -48,9 +49,11 @@ builder.Services.AddTransient<DbContext, ApplicationDbContext>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IFacebookAuthService, FacebookAuthService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ILinkedInAuthService, LinkedInAuthService>();
 
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("Google"));
 builder.Services.Configure<FacebookAuthConfig>(builder.Configuration.GetSection("Facebook"));
+builder.Services.Configure<LinkedInAuthConfig>(builder.Configuration.GetSection("LinkedIn"));
 
 builder.Services.AddHttpClient("Facebook", c =>
 {

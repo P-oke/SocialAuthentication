@@ -24,7 +24,7 @@ namespace SocialAuthentication.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponse<bool>), 200)]
-        public async Task<IActionResult> GoogleSignIn(GoogleSignInVM model)
+        public async Task<IActionResult> GoogleSignIn([FromBody] GoogleSignInVM model)
         {
             try
             {
@@ -43,11 +43,30 @@ namespace SocialAuthentication.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponse<bool>), 200)]
-        public async Task<IActionResult> FacebookSignIn(FacebookSignInVM model) 
+        public async Task<IActionResult> FacebookSignIn([FromBody] FacebookSignInVM model)
         {
             try
             {
                 return ReturnResponse(await _authService.SignInWithFacebook(model));
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+        }
+
+        /// <summary>
+        /// SIGN IN WITH LINKEDIN
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ProducesResponseType(typeof(BaseResponse<bool>), 200)]
+        public async Task<IActionResult> LinkedInSignIn([FromBody] LinkedInSignInVM model)  
+        {
+            try
+            {
+                return ReturnResponse(await _authService.SignInWithLinkedIn(model));
             }
             catch (Exception ex)
             {
