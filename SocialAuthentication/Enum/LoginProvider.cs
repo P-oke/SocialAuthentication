@@ -3,6 +3,7 @@
     public enum LoginProvider
     {
         Google = 1,
-        Facebook
+        Facebook,
+        LinkedIn
     }
 }

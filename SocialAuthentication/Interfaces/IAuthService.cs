@@ -7,5 +7,6 @@ namespace SocialAuthentication.Interfaces
     {
         Task<BaseResponse<JwtResponseVM>> SignInWithGoogle(GoogleSignInVM model);
         Task<BaseResponse<JwtResponseVM>> SignInWithFacebook(FacebookSignInVM model);
+        Task<BaseResponse<JwtResponseVM>> SignInWithLinkedIn(LinkedInSignInVM model);
     } 
 }

@@ -62,6 +62,11 @@ namespace SocialAuthentication.Util
                         userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
                     }
                     break;
+                case LoginProvider.LinkedIn:
+                    {
+                        userLoginInfo = new UserLoginInfo(loginProvider.GetDisplayName(), model.LoginProviderSubject, loginProvider.GetDisplayName().ToUpper());
+                    }
+                    break;
                 default:
                     break;
             }

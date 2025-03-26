@@ -12,6 +12,7 @@ using SocialAuthentication.Enum;
 using SocialAuthentication.FacebookAuthentication;
 using SocialAuthentication.GoogleAuthentication;
 using SocialAuthentication.Interfaces;
+using SocialAuthentication.LinkedInAuthentication;
 using SocialAuthentication.Util;
 using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
@@ -31,6 +32,7 @@ namespace SocialAuthentication.Services
         private readonly ApplicationDbContext _context;
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IFacebookAuthService _facebookAuthService;
+        private readonly ILinkedInAuthService _linkedInAuthService;
         private readonly UserManager<User> _userManager;
         private readonly Jwt _jwt; 
 
@@ -38,12 +40,14 @@ namespace SocialAuthentication.Services
             ApplicationDbContext context, 
             IGoogleAuthService googleAuthService, 
             IFacebookAuthService  facebookAuthService, 
+            ILinkedInAuthService linkedInAuthService,
             UserManager<User> userManager,
             IOptions<Jwt>jwt)
         {
             _context = context; 
             _googleAuthService = googleAuthService;
             _facebookAuthService = facebookAuthService;
+            _linkedInAuthService = linkedInAuthService;
             _userManager = userManager;
             _jwt = jwt.Value;
         }
@@ -98,6 +102,50 @@ namespace SocialAuthentication.Services
             };
 
             var user = await _userManager.CreateUserFromSocialLogin(_context, userToBeCreated, LoginProvider.Facebook);
+
+            if (user is not null)
+            {
+                var jwtResponse = CreateJwtToken(user);
+
+                var data = new JwtResponseVM
+                {
+                    Token = jwtResponse,
+                };
+
+                return new BaseResponse<JwtResponseVM>(data);
+            }
+
+            return new BaseResponse<JwtResponseVM>(null, userInfo.Errors);
+
+        }
+
+        /// <summary>
+        /// LinkedIn SignIn
+        /// </summary>
+        /// <param name="model">the view model</param>
+        /// <returns>Task&lt;BaseResponse&lt;JwtResponseVM&gt;&gt;</returns>
+        public async Task<BaseResponse<JwtResponseVM>> SignInWithLinkedIn(LinkedInSignInVM model) 
+        {
+            var linkedInAccessToken = await _linkedInAuthService.GenerateLinkedInAccessToken(model.AuthorizationCode); 
+
+            if (linkedInAccessToken.Errors.Any())
+                return new BaseResponse<JwtResponseVM>(linkedInAccessToken.ResponseMessage, linkedInAccessToken.Errors);
+
+            var userInfo = await _linkedInAuthService.GetLinkedInUserInfo(linkedInAccessToken.Data.AccessToken);
+
+            if (userInfo.Errors.Any())
+                return new BaseResponse<JwtResponseVM>(null, userInfo.Errors);
+
+            var userToBeCreated = new CreateUserFromSocialLogin
+            {
+                FirstName = userInfo.Data.GivenName,
+                LastName = userInfo.Data.FamilyName,
+                Email = userInfo.Data.Email,
+                ProfilePicture = userInfo.Data.Picture,
+                LoginProviderSubject = userInfo.Data.Sub,
+            };
+
+            var user = await _userManager.CreateUserFromSocialLogin(_context, userToBeCreated, LoginProvider.LinkedIn);
 
             if (user is not null)
             {
